@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {  
+  background: url('./assets/background.svg') no-repeat center center fixed;
+  background-size: 100% 100%; /* Ensures the background covers the entire width */
+  padding: 0;
+  margin: 0;
+}
