@@ -14,6 +14,11 @@ const Sketch = ({ inputValue, setLoading }) => {
                 `http://localhost:8080/api/magenta/check?word=${inputValue}`
             );
             console.log(response.data);
+            // Delete all childern of the container
+            const container = document.getElementById('sketch-container');
+            while (container.firstChild) {
+                container.removeChild(container.firstChild);
+            }
             if (response.data.flag === false) {
                 setStrokes(response.data.word);
                 setLoading(false);
