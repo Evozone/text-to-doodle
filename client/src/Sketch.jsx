@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import * as ms from '@magenta/sketch';
+import axios from 'axios';
 
 const Sketch = ({ inputValue, setLoading }) => {
     const [model, setModel] = useState(null);
@@ -8,15 +9,16 @@ const Sketch = ({ inputValue, setLoading }) => {
 
     useEffect(() => {
         const checkInputAvailability = async () => {
-            const response = await fetch(
-                `https://abcd.com/magenta/check?word=${inputValue}`
+            const response = await axios.get(
+                `http://localhost:8080/api/magenta/check?word=${inputValue}`
             );
-            if (response.flag === false) {
-                setStrokes(response.strokes);
+            console.log(response.data);
+            if (response.data.flag === false) {
+                setStrokes(response.data.strokes);
                 setLoading(false);
                 return;
             } else {
-                const modelValue = response.word;
+                const modelValue = response.data.word;
                 loadModel(modelValue);
             }
         };
