@@ -4,8 +4,23 @@ import * as ms from '@magenta/sketch';
 const Sketch = ({ inputValue, setLoading }) => {
     const [model, setModel] = useState(null);
     const [modelLoaded, setModelLoaded] = useState(false);
+    const [strokes, setStrokes] = useState([]);
 
     useEffect(() => {
+        const checkInputAvailability = async () => {
+            const response = await fetch(
+                `https://abcd.com/magenta/check?word=${inputValue}`
+            );
+            if (response.flag === false) {
+                setStrokes(response.strokes);
+                setLoading(false);
+                return;
+            } else {
+                const modelValue = response.word;
+                loadModel(modelValue);
+            }
+        };
+
         // Load the model on component mount or object change
         if (modelLoaded) {
             setModel(null); // Unload the model
@@ -20,14 +35,15 @@ const Sketch = ({ inputValue, setLoading }) => {
             canvas.remove();
         }
 
-        const loadModel = async () => {
+        const loadModel = async (modelValue) => {
             console.log('Loading model...');
             setLoading(true);
             try {
                 const newModel = new ms.SketchRNN(
-                    `https://storage.googleapis.com/quickdraw-models/sketchRNN/large_models/${inputValue}.gen.json`
+                    `https://storage.googleapis.com/quickdraw-models/sketchRNN/large_models/${modelValue}.gen.json`
                 );
                 await newModel.initialize();
+                // Initialize the scale factor for the model. Bigger -> large outputs
                 newModel.setPixelFactor(3.0);
                 setModel(newModel);
                 setModelLoaded(true);
@@ -40,7 +56,7 @@ const Sketch = ({ inputValue, setLoading }) => {
         };
 
         if (inputValue) {
-            loadModel();
+            checkInputAvailability();
         }
 
         return () => {
