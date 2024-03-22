@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import * as ms from '@magenta/sketch';
 import axios from 'axios';
+import * as vtp from './vecterrapen';
 
 const Sketch = ({ inputValue, setLoading }) => {
     const [model, setModel] = useState(null);
@@ -14,7 +15,7 @@ const Sketch = ({ inputValue, setLoading }) => {
             );
             console.log(response.data);
             if (response.data.flag === false) {
-                setStrokes(response.data.strokes);
+                setStrokes(response.data.word);
                 setLoading(false);
                 return;
             } else {
@@ -158,6 +159,75 @@ const Sketch = ({ inputValue, setLoading }) => {
             new window.p5((p) => sketch(p), 'sketch-container');
         }
     }, [model]);
+
+    async function drawStroke(strokesArray, pen) {
+        const smoothness = 5; // You can adjust this parameter for more or less smoothing
+
+        for (const stroke of strokesArray) {
+            pen.penUp();
+            pen.goto(stroke[0][0], stroke[1][0]);
+            pen.penDown();
+
+            for (let i = 1; i < stroke[0].length; i++) {
+                const startX = stroke[0][i - 1];
+                const startY = stroke[1][i - 1];
+                const endX = stroke[0][i];
+                const endY = stroke[1][i];
+
+                // Calculate intermediate points using quadratic Bezier curve
+                for (let t = 0; t <= 1; t += 1 / smoothness) {
+                    const x = startX + (endX - startX) * t;
+                    const y = startY + (endY - startY) * t;
+                    pen.goto(x, y);
+                    await new Promise((resolve) => setTimeout(resolve, 10)); // Adjust the delay time as needed
+                }
+            }
+        }
+    }
+
+    function transformAndTranslate(strokesArray) {
+        strokesArray = JSON.parse(strokesArray);
+
+        let transformedArray = strokesArray.map((stroke) => {
+            let transformedStroke = [
+                stroke[0].map((x) => x - 125),
+                stroke[1].map((y) => -y + 125),
+            ];
+
+            return transformedStroke;
+        });
+
+        return transformedArray;
+    }
+
+    // Strokes with Quickdraw
+    useEffect(() => {
+        // Wait for strokes to be available
+        if (strokes?.length > 0) {
+            const containerSize = document
+                .getElementById('sketch-container')
+                .getBoundingClientRect();
+            const screenWidth = Math.floor(containerSize.width) - 22;
+            const screenHeight = Math.floor(containerSize.height) - 9;
+
+            // setup first screen
+            const screen_1 = vtp.penScreen(screenWidth, screenHeight, 'sketch-container');
+            const pen_1 = vtp.addPenTo(screen_1);
+
+            // Set the colors of the screen
+            screen_1.bgColor('white');
+            pen_1.penColor('black');
+
+            // Pick a random stroke
+            const randomStroke = strokes[Math.floor(Math.random() * strokes.length)];
+
+            console.log('Drawing stroke:', randomStroke);
+
+            // Draw the stroke
+            const transformedStrokesArray = transformAndTranslate(randomStroke);
+            drawStroke(transformedStrokesArray, pen_1);
+        }
+    }, [strokes]);
 
     return (
         <>
