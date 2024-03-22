@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import * as ms from '@magenta/sketch';
 
-const Sketch = ({ inputValue }) => {
+const Sketch = ({ inputValue, setLoading }) => {
     const [model, setModel] = useState(null);
     const [modelLoaded, setModelLoaded] = useState(false);
 
@@ -22,6 +22,7 @@ const Sketch = ({ inputValue }) => {
 
         const loadModel = async () => {
             console.log('Loading model...');
+            setLoading(true);
             try {
                 const newModel = new ms.SketchRNN(
                     `https://storage.googleapis.com/quickdraw-models/sketchRNN/large_models/${inputValue}.gen.json`
@@ -35,6 +36,7 @@ const Sketch = ({ inputValue }) => {
                 alert('Some error occured while loading the model. Please try again.');
                 console.error('Error loading model:', error);
             }
+            setLoading(false);
         };
 
         if (inputValue) {
@@ -70,8 +72,8 @@ const Sketch = ({ inputValue }) => {
                     const containerSize = document
                         .getElementById('sketch-container')
                         .getBoundingClientRect();
-                    const screenWidth = Math.floor(containerSize.width);
-                    const screenHeight = Math.floor(containerSize.height) - 8;
+                    const screenWidth = Math.floor(containerSize.width) - 22;
+                    const screenHeight = Math.floor(containerSize.height) - 9;
                     console.log('Canvas size:', screenWidth, screenHeight); // Log canvas size
                     p.createCanvas(screenWidth, screenHeight);
                     p.frameRate(60);
@@ -141,7 +143,10 @@ const Sketch = ({ inputValue }) => {
 
     return (
         <>
-            <div id="sketch-container" className="h-full border-4 border-black" />
+            <div
+                id="sketch-container"
+                className="h-full border-4 rounded-xl border-black"
+            />
         </>
     );
 };
