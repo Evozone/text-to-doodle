@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import * as ms from '@magenta/sketch';
 import axios from 'axios';
-import * as vtp from './vecterrapen';
+import * as vtp from '../vecterrapen';
 
 const Sketch = ({ inputValue, setLoading }) => {
     const [model, setModel] = useState(null);
@@ -231,6 +231,8 @@ const Sketch = ({ inputValue, setLoading }) => {
             // Draw the stroke
             const transformedStrokesArray = transformAndTranslate(randomStroke);
             drawStroke(transformedStrokesArray, pen_1);
+
+            setLoading(false);
         }
     }, [strokes]);
 
