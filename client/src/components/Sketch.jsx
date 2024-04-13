@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import * as ms from '@magenta/sketch';
 import axios from 'axios';
 import * as vtp from '../vecterrapen';
+import Feedback from './Feedback';
 
 const Sketch = ({ inputValue, setLoading }) => {
     const [model, setModel] = useState(null);
     const [modelLoaded, setModelLoaded] = useState(false);
     const [strokes, setStrokes] = useState([]);
+    const [feedbackVisible, setFeedbackVisible] = useState(false);
 
     useEffect(() => {
         const checkInputAvailability = async () => {
@@ -63,6 +65,7 @@ const Sketch = ({ inputValue, setLoading }) => {
             setLoading(false);
         };
 
+        setFeedbackVisible(false);
         if (inputValue) {
             checkInputAvailability();
         }
@@ -162,6 +165,7 @@ const Sketch = ({ inputValue, setLoading }) => {
 
             // Create p5 instance
             new window.p5((p) => sketch(p), 'sketch-container');
+            setFeedbackVisible(true);
         }
     }, [model]);
 
@@ -188,6 +192,7 @@ const Sketch = ({ inputValue, setLoading }) => {
                 }
             }
         }
+        setFeedbackVisible(true);
     }
 
     function transformAndTranslate(strokesArray) {
@@ -231,7 +236,6 @@ const Sketch = ({ inputValue, setLoading }) => {
             // Draw the stroke
             const transformedStrokesArray = transformAndTranslate(randomStroke);
             drawStroke(transformedStrokesArray, pen_1);
-
             setLoading(false);
         }
     }, [strokes]);
@@ -242,6 +246,7 @@ const Sketch = ({ inputValue, setLoading }) => {
                 id="sketch-container"
                 className="h-full border-4 rounded-xl border-black"
             />
+            {feedbackVisible && <Feedback />}
         </>
     );
 };
