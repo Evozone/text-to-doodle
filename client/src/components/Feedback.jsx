@@ -1,11 +1,13 @@
 import { useEffect, useState, useRef } from 'react';
 import { FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
+import axios from 'axios';
 
-const Feedback = () => {
+const Feedback = ({ inputValue }) => {
     const [likeColored, setLikeColored] = useState(false);
     const [dislikeColored, setDislikeColored] = useState(false);
     const [visible, setVisible] = useState(false);
     const [showModal, setShowModal] = useState(false);
+    const [strokes, setStrokes] = useState([]);
 
     const toggleLikeColor = () => {
         if (!likeColored) setVisible(true);
@@ -40,6 +42,8 @@ const Feedback = () => {
             color: 'black',
         };
         let drawing = false;
+        let xdraw = [];
+        let ydraw = [];
         const drawLine = (x0, y0, x1, y1, color) => {
             context.beginPath();
             context.moveTo(x0, y0);
@@ -54,6 +58,8 @@ const Feedback = () => {
             const rect = canvas.getBoundingClientRect();
             current.x = (e.clientX || e.touches[0].clientX) - rect.left;
             current.y = (e.clientY || e.touches[0].clientY) - rect.top;
+            xdraw = [Math.round(current.x)];
+            ydraw = [Math.round(current.y)];
         };
         const onMouseMove = (e) => {
             if (!drawing) {
@@ -69,6 +75,8 @@ const Feedback = () => {
             );
             current.x = (e.clientX || e.touches[0].clientX) - rect.left;
             current.y = (e.clientY || e.touches[0].clientY) - rect.top;
+            xdraw.push(Math.round(current.x));
+            ydraw.push(Math.round(current.y));
         };
         const onMouseUp = (e) => {
             if (!drawing) {
@@ -83,6 +91,9 @@ const Feedback = () => {
                 (e.clientY || e.touches[0].clientY) - rect.top,
                 current.color
             );
+            let newStrokes = strokes;
+            newStrokes.push([[xdraw], [ydraw]]);
+            setStrokes(newStrokes);
         };
         const throttle = (callback, delay) => {
             let previousCall = new Date().getTime();
@@ -114,7 +125,41 @@ const Feedback = () => {
 
         return () => {};
     }, [showModal]);
+    function arrayToString(arr) {
+        let str = '[';
+        for (let i = 0; i < arr.length; i++) {
+            str += '[';
+            for (let j = 0; j < arr[i].length; j++) {
+                str += '[' + arr[i][j].join(',') + ']';
+                if (j < arr[i].length - 1) {
+                    str += ',';
+                }
+            }
+            str += ']';
+            if (i < arr.length - 1) {
+                str += ',';
+            }
+        }
+        str += ']';
+        return str;
+    }
+    const clearCanvas = () => {
+        const canvas = canvasRef.current;
+        const context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        console.log(arrayToString(strokes));
+        setStrokes([]);
+        setShowModal(false);
+    };
 
+    const submitDoodle = async () => {
+        await axios.post(`http://localhost:8080/api/magenta/strokes`, {
+            word: inputValue,
+            strokes: arrayToString(strokes),
+        });
+        setShowModal(false);
+        alert('Doodle submitted successfully');
+    };
     return (
         <>
             <div className="w-min px-4 py-2.5 mt-2 bg-gray-100 rounded-2xl relative">
@@ -183,14 +228,14 @@ const Feedback = () => {
                                     <button
                                         className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                                         type="button"
-                                        onClick={() => setShowModal(false)}
+                                        onClick={clearCanvas}
                                     >
                                         Close
                                     </button>
                                     <button
                                         className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                                         type="button"
-                                        onClick={() => setShowModal(false)}
+                                        onClick={submitDoodle}
                                     >
                                         Submit Doodle
                                     </button>

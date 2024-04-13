@@ -31,3 +31,15 @@ export const checkMagenta = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
+
+export const postStrokes = async (req, res) => {
+  const { word, strokes } = req.body;
+  //console.log(word, strokes);
+  try {
+    const url = `${process.env.DOODLE_STROKE_WEAVIATE}/add_stroke`;
+    const response = await axios.post(url, { word: word, strokes: strokes });
+    res.status(200).json({ message: "Strokes saved successfully" });
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};

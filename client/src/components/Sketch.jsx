@@ -246,7 +246,7 @@ const Sketch = ({ inputValue, setLoading }) => {
                 id="sketch-container"
                 className="h-full border-4 rounded-xl border-black"
             />
-            {feedbackVisible && <Feedback />}
+            {feedbackVisible && <Feedback inputValue={inputValue} />}
         </>
     );
 };
