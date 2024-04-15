@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import * as ms from '@magenta/sketch';
 import axios from 'axios';
 import * as vtp from '../vecterrapen';
@@ -7,6 +7,9 @@ import html2canvas from 'html2canvas';
 import { FaDownload } from 'react-icons/fa';
 import { FaShareAlt } from 'react-icons/fa';
 import { FaRedo } from 'react-icons/fa';
+import storage from '../../src/appwite';
+import { v4 as uuid } from 'uuid';
+import { FaCopy } from 'react-icons/fa6';
 
 const Sketch = ({ inputValue, setLoading }) => {
     const [model, setModel] = useState(null);
@@ -14,8 +17,10 @@ const Sketch = ({ inputValue, setLoading }) => {
     const [strokes, setStrokes] = useState([]);
     const [feedbackVisible, setFeedbackVisible] = useState(false);
     const [ModelOrStroke, setModelOrStroke] = useState(0); // 0 for model, 1 for stroke
-    const [copySuccess, setCopySuccess] = useState(false);
+    const [copyMessage, setCopyMessage] = useState('');
     const [rerenderFlag, setRerenderFlag] = useState(0);
+
+    const previousImageDataRef = useRef({ imageData: null, imageUrl: null });
 
     useEffect(() => {
         const checkInputAvailability = async () => {
@@ -247,6 +252,7 @@ const Sketch = ({ inputValue, setLoading }) => {
             setLoading(false);
         }
     }, [strokes]);
+
     function downloadAsPNG() {
         if (ModelOrStroke === 0) {
             const canvas = document.querySelector('canvas');
@@ -269,28 +275,40 @@ const Sketch = ({ inputValue, setLoading }) => {
         }
     }
 
-    function shareDrawing() {
-        const container = document.getElementById('sketch-container');
-        html2canvas(container).then((canvas) => {
-            // Convert the captured content to a data URL
-            const dataUrl = canvas.toDataURL();
-
-            // Write data URL to clipboard
+    const copyLinkDrawing = async () => {
+        setCopyMessage('Copying link...');
+        const sketchContainer = document.getElementById('sketch-container');
+        const canvas = await html2canvas(sketchContainer);
+        const imageData = canvas.toDataURL();
+        if (previousImageDataRef.current.imageData === imageData) {
             navigator.clipboard
-                .writeText(dataUrl)
+                .writeText(previousImageDataRef.current.imageUrl)
                 .then(() => {
-                    console.log('Data URL copied to clipboard:', dataUrl);
-                    setCopySuccess(true);
+                    setCopyMessage('Copied link to clipboard!');
                     setTimeout(() => {
-                        setCopySuccess(false);
-                    }, 2500); // Hide message after 5 seconds
-                })
-                .catch((error) => {
-                    console.error('Error copying data URL to clipboard:', error);
-                    alert('Failed to copy data URL to clipboard. Please try again.');
+                        setCopyMessage('');
+                    }, 4000);
                 });
-        });
-    }
+        } else {
+            previousImageDataRef.current.imageData = imageData;
+            const blob = await fetch(imageData).then((res) => res.blob());
+            const file = new File([blob], `sketch-${inputValue}.png`, {
+                type: 'image/png',
+            });
+            const bucketId = import.meta.env.VITE_APPWRITE_BUCKET_ID;
+            const id = uuid();
+            const response = await storage.createFile(bucketId || '', id, file);
+            const result = storage.getFilePreview(bucketId || '', id);
+            previousImageDataRef.current.imageUrl = result.href;
+            console.log(result.href);
+            navigator.clipboard.writeText(result.href).then(() => {
+                setCopyMessage('Copied link to clipboard!');
+                setTimeout(() => {
+                    setCopyMessage('');
+                }, 4000);
+            });
+        }
+    };
 
     function redrawSketch() {
         console.log('Redrawing sketch...');
@@ -311,9 +329,9 @@ const Sketch = ({ inputValue, setLoading }) => {
                             onClick={downloadAsPNG}
                             title="Download as PNG"
                         />
-                        <FaShareAlt
+                        <FaCopy
                             className="absolute bottom-0 right-0 text-gray-500 hover:text-black text-3xl mb-4 mr-16 cursor-pointer"
-                            onClick={shareDrawing}
+                            onClick={copyLinkDrawing}
                             title="Copy to clipboard"
                         />
                         <FaRedo
@@ -321,9 +339,9 @@ const Sketch = ({ inputValue, setLoading }) => {
                             onClick={redrawSketch}
                             title="Redraw Sketch"
                         />
-                        {copySuccess && (
+                        {copyMessage.length > 0 && (
                             <div className="absolute bottom-0 left-0 mb-4 ml-8 text-white bg-green-500 px-2 py-1 rounded">
-                                Copied to clipboard!
+                                {copyMessage}
                             </div>
                         )}
                     </>
