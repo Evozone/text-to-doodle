@@ -3,12 +3,19 @@ import * as ms from '@magenta/sketch';
 import axios from 'axios';
 import * as vtp from '../vecterrapen';
 import Feedback from './Feedback';
+import html2canvas from 'html2canvas';
+import { FaDownload } from 'react-icons/fa';
+import { FaShareAlt } from 'react-icons/fa';
+import { FaRedo } from 'react-icons/fa';
 
 const Sketch = ({ inputValue, setLoading }) => {
     const [model, setModel] = useState(null);
     const [modelLoaded, setModelLoaded] = useState(false);
     const [strokes, setStrokes] = useState([]);
     const [feedbackVisible, setFeedbackVisible] = useState(false);
+    const [ModelOrStroke, setModelOrStroke] = useState(0); // 0 for model, 1 for stroke
+    const [copySuccess, setCopySuccess] = useState(false);
+    const [rerenderFlag, setRerenderFlag] = useState(0);
 
     useEffect(() => {
         const checkInputAvailability = async () => {
@@ -22,6 +29,7 @@ const Sketch = ({ inputValue, setLoading }) => {
                 container.removeChild(container.firstChild);
             }
             if (response.data.flag === false) {
+                setModelOrStroke(1);
                 setStrokes(response.data.word);
                 setLoading(false);
                 return;
@@ -73,7 +81,7 @@ const Sketch = ({ inputValue, setLoading }) => {
         return () => {
             // Cleanup function when the component unmounts (optional)
         };
-    }, [inputValue]);
+    }, [inputValue, rerenderFlag]);
 
     useEffect(() => {
         console.log('Model loaded:', modelLoaded);
@@ -116,6 +124,7 @@ const Sketch = ({ inputValue, setLoading }) => {
                     // If we finished the previous drawing, start a new one.
                     if (previousPen[PEN.END] === 1) {
                         p.noLoop();
+                        setFeedbackVisible(true);
                     }
 
                     // Sample new state using the provided sampleNewState function
@@ -165,7 +174,6 @@ const Sketch = ({ inputValue, setLoading }) => {
 
             // Create p5 instance
             new window.p5((p) => sketch(p), 'sketch-container');
-            setFeedbackVisible(true);
         }
     }, [model]);
 
@@ -239,13 +247,88 @@ const Sketch = ({ inputValue, setLoading }) => {
             setLoading(false);
         }
     }, [strokes]);
+    function downloadAsPNG() {
+        if (ModelOrStroke === 0) {
+            const canvas = document.querySelector('canvas');
+            const link = document.createElement('a');
+            link.download = `sketch-${inputValue}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        } else {
+            const container = document.getElementById('sketch-container');
+            html2canvas(container).then((canvas) => {
+                // Convert the captured content to a data URL
+                const dataUrl = canvas.toDataURL();
+                // Create a download link for the image
+                const link = document.createElement('a');
+                link.download = `sketch-${inputValue}.png`;
+                link.href = dataUrl;
+                // Programmatically trigger download
+                link.click();
+            });
+        }
+    }
+
+    function shareDrawing() {
+        const container = document.getElementById('sketch-container');
+        html2canvas(container).then((canvas) => {
+            // Convert the captured content to a data URL
+            const dataUrl = canvas.toDataURL();
+
+            // Write data URL to clipboard
+            navigator.clipboard
+                .writeText(dataUrl)
+                .then(() => {
+                    console.log('Data URL copied to clipboard:', dataUrl);
+                    setCopySuccess(true);
+                    setTimeout(() => {
+                        setCopySuccess(false);
+                    }, 2500); // Hide message after 5 seconds
+                })
+                .catch((error) => {
+                    console.error('Error copying data URL to clipboard:', error);
+                    alert('Failed to copy data URL to clipboard. Please try again.');
+                });
+        });
+    }
+
+    function redrawSketch() {
+        console.log('Redrawing sketch...');
+        setRerenderFlag((prev) => prev + 1);
+    }
 
     return (
         <>
-            <div
-                id="sketch-container"
-                className="h-full border-4 rounded-xl border-black"
-            />
+            <div className="relative h-full">
+                <div
+                    id="sketch-container"
+                    className="h-full border-4 rounded-xl border-black"
+                />
+                {feedbackVisible && (
+                    <>
+                        <FaDownload
+                            className="absolute bottom-0 right-0 text-gray-500 hover:text-black text-3xl mb-4 mr-28 cursor-pointer"
+                            onClick={downloadAsPNG}
+                            title="Download as PNG"
+                        />
+                        <FaShareAlt
+                            className="absolute bottom-0 right-0 text-gray-500 hover:text-black text-3xl mb-4 mr-16 cursor-pointer"
+                            onClick={shareDrawing}
+                            title="Copy to clipboard"
+                        />
+                        <FaRedo
+                            className="absolute bottom-0 right-0 text-gray-500 hover:text-black text-3xl mb-4 mr-4 cursor-pointer"
+                            onClick={redrawSketch}
+                            title="Redraw Sketch"
+                        />
+                        {copySuccess && (
+                            <div className="absolute bottom-0 left-0 mb-4 ml-8 text-white bg-green-500 px-2 py-1 rounded">
+                                Copied to clipboard!
+                            </div>
+                        )}
+                    </>
+                )}
+            </div>
             {feedbackVisible && <Feedback inputValue={inputValue} />}
         </>
     );
