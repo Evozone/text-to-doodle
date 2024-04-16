@@ -1,15 +1,19 @@
+// React related imports
 import { useEffect, useState, useRef } from 'react';
+
+// For sketching
 import * as ms from '@magenta/sketch';
-import axios from 'axios';
 import * as vtp from '../vecterrapen';
-import Feedback from './Feedback';
+
+// Misc imports
+import axios from 'axios';
 import html2canvas from 'html2canvas';
-import { FaDownload } from 'react-icons/fa';
-import { FaShareAlt } from 'react-icons/fa';
-import { FaRedo } from 'react-icons/fa';
-import storage from '../../src/appwite';
 import { v4 as uuid } from 'uuid';
-import { FaCopy } from 'react-icons/fa6';
+
+// Local imports
+import Feedback from './post-generation/Feedback';
+import ImageActions from './post-generation/ImageActions';
+import storage from '../../src/appwite';
 
 const Sketch = ({ inputValue, setLoading }) => {
     const [model, setModel] = useState(null);
@@ -295,14 +299,22 @@ const Sketch = ({ inputValue, setLoading }) => {
             const file = new File([blob], `sketch-${inputValue}.png`, {
                 type: 'image/png',
             });
+
             const bucketId = import.meta.env.VITE_APPWRITE_BUCKET_ID;
             const id = uuid();
             const response = await storage.createFile(bucketId || '', id, file);
+            if (!response) {
+                setCopyMessage('Error copying link to clipboard!');
+                return;
+            }
+
             const result = storage.getFilePreview(bucketId || '', id);
             previousImageDataRef.current.imageUrl = result.href;
             console.log(result.href);
+
             navigator.clipboard.writeText(result.href).then(() => {
                 setCopyMessage('Copied link to clipboard!');
+
                 setTimeout(() => {
                     setCopyMessage('');
                 }, 4000);
@@ -323,28 +335,12 @@ const Sketch = ({ inputValue, setLoading }) => {
                     className="h-full border-4 rounded-xl border-black"
                 />
                 {feedbackVisible && (
-                    <>
-                        <FaDownload
-                            className="absolute bottom-0 right-0 text-gray-500 hover:text-black text-3xl mb-4 mr-28 cursor-pointer"
-                            onClick={downloadAsPNG}
-                            title="Download as PNG"
-                        />
-                        <FaCopy
-                            className="absolute bottom-0 right-0 text-gray-500 hover:text-black text-3xl mb-4 mr-16 cursor-pointer"
-                            onClick={copyLinkDrawing}
-                            title="Copy to clipboard"
-                        />
-                        <FaRedo
-                            className="absolute bottom-0 right-0 text-gray-500 hover:text-black text-3xl mb-4 mr-4 cursor-pointer"
-                            onClick={redrawSketch}
-                            title="Redraw Sketch"
-                        />
-                        {copyMessage.length > 0 && (
-                            <div className="absolute bottom-0 left-0 mb-4 ml-8 text-white bg-green-500 px-2 py-1 rounded">
-                                {copyMessage}
-                            </div>
-                        )}
-                    </>
+                    <ImageActions
+                        downloadAsPNG={downloadAsPNG}
+                        copyLinkDrawing={copyLinkDrawing}
+                        redrawSketch={redrawSketch}
+                        copyMessage={copyMessage}
+                    />
                 )}
             </div>
             {feedbackVisible && <Feedback inputValue={inputValue} />}

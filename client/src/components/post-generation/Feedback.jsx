@@ -17,10 +17,21 @@ const Feedback = ({ inputValue }) => {
     };
 
     const toggleDislikeColor = () => {
-        if (!dislikeColored) setShowModal(true);
+        const dialog = document.querySelector('dialog');
+        if (!dislikeColored) {
+            dialog.showModal();
+            setShowModal(true);
+        }
         setVisible(false);
         setDislikeColored(!dislikeColored);
         setLikeColored(false);
+    };
+
+    const closeModal = () => {
+        const dialog = document.querySelector('dialog');
+        dialog.close();
+        setShowModal(false);
+        setDislikeColored(false);
     };
 
     useEffect(() => {
@@ -35,6 +46,7 @@ const Feedback = ({ inputValue }) => {
     const canvasRef = useRef(null);
 
     useEffect(() => {
+        // Canvas Config
         const canvas = canvasRef.current;
         if (!canvas) return;
         const context = canvas.getContext('2d');
@@ -44,6 +56,8 @@ const Feedback = ({ inputValue }) => {
         let drawing = false;
         let xdraw = [];
         let ydraw = [];
+
+        // Helper Function
         const drawLine = (x0, y0, x1, y1, color) => {
             context.beginPath();
             context.moveTo(x0, y0);
@@ -53,6 +67,8 @@ const Feedback = ({ inputValue }) => {
             context.stroke();
             context.closePath();
         };
+
+        // Mouse Actions
         const onMouseDown = (e) => {
             drawing = true;
             const rect = canvas.getBoundingClientRect();
@@ -95,6 +111,8 @@ const Feedback = ({ inputValue }) => {
             newStrokes.push([[xdraw], [ydraw]]);
             setStrokes(newStrokes);
         };
+
+        // To avoid lag while drawing
         const throttle = (callback, delay) => {
             let previousCall = new Date().getTime();
             return function () {
@@ -106,6 +124,7 @@ const Feedback = ({ inputValue }) => {
                 }
             };
         };
+
         canvas.addEventListener('mousedown', onMouseDown);
         canvas.addEventListener('mouseup', onMouseUp);
         canvas.addEventListener('mouseout', onMouseUp);
@@ -115,16 +134,19 @@ const Feedback = ({ inputValue }) => {
         canvas.addEventListener('touchend', onMouseUp);
         canvas.addEventListener('touchcancel', onMouseUp);
         canvas.addEventListener('touchmove', throttle(onMouseMove, 10));
+
         const onResize = () => {
-            canvas.width = 800;
-            canvas.height = 600;
+            canvas.width = 500;
+            canvas.height = 500;
         };
 
         window.addEventListener('resize', onResize);
         onResize();
 
         return () => {};
-    }, [showModal]);
+    }, [showModal, strokes]);
+
+    // Because we need to send the strokes as a string
     function arrayToString(arr) {
         let str = '[';
         for (let i = 0; i < arr.length; i++) {
@@ -143,23 +165,26 @@ const Feedback = ({ inputValue }) => {
         str += ']';
         return str;
     }
+
     const clearCanvas = () => {
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
         context.clearRect(0, 0, canvas.width, canvas.height);
         console.log(arrayToString(strokes));
         setStrokes([]);
-        setShowModal(false);
+        closeModal();
     };
 
+    // POST
     const submitDoodle = async () => {
         await axios.post(`http://localhost:8080/api/magenta/strokes`, {
             word: inputValue,
             strokes: arrayToString(strokes),
         });
-        setShowModal(false);
+        clearCanvas();
         alert('Doodle submitted successfully');
     };
+
     return (
         <>
             <div className="w-min px-4 py-2.5 mt-2 bg-gray-100 rounded-2xl relative">
@@ -195,57 +220,42 @@ const Feedback = ({ inputValue }) => {
                     </span>
                 </div>
             </div>
-            {showModal ? (
-                <>
-                    <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
-                        <div className="relative w-auto my-6 mx-auto max-w-6xl">
-                            {/*content*/}
-                            <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
-                                {/*header*/}
-                                <div className="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
-                                    <h3 className="text-3xl font-semibold">
-                                        Remake Request: Can You Draw It Better Than AI?
-                                    </h3>
-                                    <button
-                                        className="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
-                                        onClick={() => setShowModal(false)}
-                                    >
-                                        <span className="bg-transparent text-black opacity-5 h-6 w-6 text-2xl block outline-none focus:outline-none">
-                                            ×
-                                        </span>
-                                    </button>
-                                </div>
-                                {/*body*/}
-                                <div className="relative p-6 flex-auto">
-                                    <canvas
-                                        ref={canvasRef}
-                                        width={400}
-                                        height={200}
-                                    ></canvas>
-                                </div>
-                                {/*footer*/}
-                                <div className="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b">
-                                    <button
-                                        className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                                        type="button"
-                                        onClick={clearCanvas}
-                                    >
-                                        Close
-                                    </button>
-                                    <button
-                                        className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                                        type="button"
-                                        onClick={submitDoodle}
-                                    >
-                                        Submit Doodle
-                                    </button>
-                                </div>
-                            </div>
+
+            <dialog className="rounded-md">
+                <div className="flex relative w-auto mx-auto max-w-5xl">
+                    {/* Left side column */}
+                    <div className="flex flex-col justify-between h-auto w-80">
+                        {/* Header */}
+                        <div className="p-5 border-b border-solid border-blueGray-200">
+                            <h3 className="text-3xl font-semibold">
+                                Remake Request: Can You Draw It Better Than AI?
+                            </h3>
+                        </div>
+                        {/* Footer */}
+                        <div className="p-5 border-t border-solid border-blueGray-200">
+                            <button
+                                className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                                type="button"
+                                onClick={submitDoodle}
+                            >
+                                Submit Doodle
+                            </button>
+                            <button
+                                className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm border-2 border-red-500 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                                type="button"
+                                onClick={clearCanvas}
+                            >
+                                Close
+                            </button>
                         </div>
                     </div>
-                    <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
-                </>
-            ) : null}
+
+                    {/* Right side square canvas */}
+                    <div className="relative flex-auto bg-gray-100 cursor-crosshair">
+                        <canvas ref={canvasRef} width={500} height={500}></canvas>
+                    </div>
+                </div>
+            </dialog>
         </>
     );
 };
