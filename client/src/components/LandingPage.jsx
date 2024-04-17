@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import GoogleOneTapLogin from './GoogleOneTapLogin';
 import * as ms from '@magenta/sketch';
 
@@ -6,6 +6,7 @@ const LandingPage = ({ setNavigateHome }) => {
     const [model, setModel] = useState(null);
     const [modelLoaded, setModelLoaded] = useState(false);
     const [flag, setFlag] = useState(0);
+    const canvasRendered = useRef(false);
     const loadModel = async (modelValue) => {
         try {
             const newModel = new ms.SketchRNN(
@@ -16,7 +17,7 @@ const LandingPage = ({ setNavigateHome }) => {
             newModel.setPixelFactor(3.0);
             setModel(newModel);
             setModelLoaded(true);
-            console.log('SketchRNN model loaded.');
+            console.log('SketchRNN model loaded of landing');
         } catch (error) {
             alert('Some error occured while loading the model. Please try again.');
             console.error('Error loading model:', error);
@@ -24,7 +25,22 @@ const LandingPage = ({ setNavigateHome }) => {
     };
     // Load the model with initial value "flower" when component mounts
     useEffect(() => {
-        loadModel('flower');
+        if (modelLoaded) {
+            setModel(null); // Unload the model
+            setModelLoaded(false); // Reset model loaded state
+
+            // Clear the canvas
+            const canvas = document.querySelector('canvas');
+            const context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            // unmount the canvas
+            canvas.remove();
+        }
+        if (canvasRendered.current == false) {
+            canvasRendered.current = true;
+            loadModel('flower');
+        }
     }, []);
     // Drawing loop
     useEffect(() => {
