@@ -37,8 +37,5 @@ client
 export const databases = new sdk.Databases(client);
 
 const server = app.listen(PORT, () =>
-  console.log(
-    "Hello! This is comfort space's backend, listening on port - ",
-    PORT
-  )
+  console.log("Hello! This is turtle's backend, listening on port - ", PORT)
 );

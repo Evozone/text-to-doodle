@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import GoogleOneTapLogin from './GoogleOneTapLogin';
 import * as ms from '@magenta/sketch';
+import '../index.css';
 
 const LandingPage = ({ setNavigateHome }) => {
     const [model, setModel] = useState(null);
@@ -147,11 +148,21 @@ const LandingPage = ({ setNavigateHome }) => {
             </div>
             <div className="w-1/2 p-4 flex item-center flex-col">
                 <p
-                    className="h-1/4 text-3xl font-bold mt-6 text-white flex justify-center items-center"
+                    className="title shadow-black text-8xl text-green-900 font-bold drop-shadow-xl mt-10"
                     style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)' }}
                 >
-                    Sketchify - Transforming Text to Art
+                    turtle dA VincI
                 </p>
+                <p className="text-2xl text-white mb-10 mt-3">
+                    Transforming Text to Art ...
+                </p>
+                <div className=" gradient-border p-9 mb-10">
+                    <p className="text-3xl text-white">
+                        Fun fact: Leonardo's surname wasn't actually daVinci but rather it
+                        means 'from Vinci', which is just a city from Italy. It's like
+                        calling DiCaprio Leonardo da Los Angeles.
+                    </p>
+                </div>
                 <div className="flex items-center justify-center">
                     <GoogleOneTapLogin setNavigateHome={setNavigateHome} />
                 </div>

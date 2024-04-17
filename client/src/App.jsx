@@ -27,7 +27,7 @@ function App() {
                     </div>
                     <div className="basis-1/2 flex flex-col justify-center px-7">
                         <h1 className="title shadow-black text-8xl text-green-900 font-bold drop-shadow-xl">
-                            Turtle da Vinci
+                            turtle dA VincI{' '}
                         </h1>
 
                         <SubmitMessage {...{ loading }} />
