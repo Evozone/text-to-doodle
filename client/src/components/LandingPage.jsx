@@ -56,7 +56,7 @@ const LandingPage = ({ setNavigateHome }) => {
                 };
 
                 p.draw = function () {
-                    console.log('Drawing at:', x, y); // Log drawing coordinates
+                    // console.log('Drawing at:', x, y); // Log drawing coordinates
                     if (!model) return; // Wait for model to load
 
                     // If we finished the previous drawing, start a new one.

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import { FcGoogle } from 'react-icons/fc';
@@ -52,6 +52,7 @@ const GoogleOneTapLogin = ({ setNavigateHome }) => {
                 client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
                 ux_mode: 'popup',
                 callback: handleResponse,
+                use_fedcm_for_prompt: false,
             });
             window.google.accounts.id.renderButton(googleButton.current, {
                 theme: 'filled_blue',
@@ -60,9 +61,8 @@ const GoogleOneTapLogin = ({ setNavigateHome }) => {
                 text: 'continue_with',
             });
             window.google.accounts.id.prompt((notification) => {
-                if (notification.isSkippedMoment() || notification.isDismissedMoment()) {
-                    setDisplayType('none');
-                    setGBtnDisplay('flex');
+                if (notification.getSkippedReason() === 'tap_outside') {
+                    window.google.accounts.id.prompt();
                 }
             });
         } catch (error) {
@@ -71,6 +71,12 @@ const GoogleOneTapLogin = ({ setNavigateHome }) => {
         }
     };
 
+    useEffect(() => {
+        const auth = JSON.parse(window.localStorage.getItem('sketchApp'));
+        if (!(auth && auth.isSignedIn)) {
+            handleGoogleLogIn();
+        }
+    }, []);
     return (
         <React.Fragment>
             <button
