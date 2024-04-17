@@ -1,6 +1,7 @@
 import express from "express";
 import magenta from "./routes/magenta.js";
-// const mongoose = require("mongoose");
+import user from "./routes/user.js";
+import sdk from "node-appwrite";
 
 // Helper packages
 import dotenv from "dotenv";
@@ -19,9 +20,21 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: "10MB" }));
 
 app.use("/api/magenta", magenta);
+app.use("/api/user", user);
+
 app.get("/", (req, res) => {
   res.send("Hello, welocme to  API!");
 });
+
+//Database
+const client = new sdk.Client();
+
+client
+  .setEndpoint(process.env.APPWRITE_ENDPOINT) // Your API Endpoint
+  .setProject(process.env.APPWRITE_PROJECT_ID) // Your project ID
+  .setKey(process.env.APPWRITE_API_KEY);
+
+export const databases = new sdk.Databases(client);
 
 const server = app.listen(PORT, () =>
   console.log(
