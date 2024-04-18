@@ -20,6 +20,16 @@ dialog::backdrop {
   opacity: 0.75;
 }
 
+.tagline {
+  font-family: "Shantell Sans", cursive;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "BNCE" 0,
+    "INFM" 0,
+    "SPAC" 0;
+}
 
 .gradient-border {
   --border-width: 3px;
@@ -30,7 +40,6 @@ dialog::backdrop {
   align-items: center;
   font-size: 2.5rem;
   color: white;
-  background: rgb(15, 110, 0);
   border-radius: var(--border-width);
 
   &::after {

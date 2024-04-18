@@ -143,21 +143,23 @@ const LandingPage = ({ setNavigateHome }) => {
             <div className="basis-1/2 bg-white rounded-xl h-full mr-1">
                 <div
                     id="sketch-container1"
-                    className="h-full border-4 rounded-xl border-black"
+                    className="h-full border-4 rounded-xl gradient-border"
                 />
             </div>
             <div className="w-1/2 p-4 flex item-center flex-col">
                 <p
-                    className="title shadow-black text-8xl text-green-900 font-bold drop-shadow-xl mt-10"
+                    className="title shadow-black text-8xl text-green-200 font-bold drop-shadow-xl mb-2"
                     style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)' }}
                 >
-                    turtle dA VincI
+                    turtle d<span className="text-green-300 inline">A</span> Vinc
+                    <span className="text-green-300 inline">I</span>
                 </p>
-                <p className="text-2xl text-white mb-10 mt-3">
-                    Transforming Text to Art ...
+
+                <p className="tagline text-2xl text-white mb-5 mt-1">
+                    🖌️ Transforming Text to Art !
                 </p>
-                <div className=" gradient-border p-9 mb-10">
-                    <p className="text-3xl text-white">
+                <div className="gradient-border p-3 mb-5 bg-black">
+                    <p className="text-xl text-white">
                         Fun fact: Leonardo's surname wasn't actually daVinci but rather it
                         means 'from Vinci', which is just a city from Italy. It's like
                         calling DiCaprio Leonardo da Los Angeles.

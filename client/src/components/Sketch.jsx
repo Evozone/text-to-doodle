@@ -243,7 +243,9 @@ const Sketch = ({ inputValue, setLoading }) => {
 
             // Set the colors of the screen
             screen_1.bgColor('white');
-            pen_1.penColor('black');
+            // random color
+            pen_1.penColor(vtp.UTILS.randRGB());
+            pen_1.penSize(3);
 
             // Pick a random stroke
             const randomStroke = strokes[Math.floor(Math.random() * strokes.length)];
@@ -332,7 +334,7 @@ const Sketch = ({ inputValue, setLoading }) => {
             <div className="relative h-full">
                 <div
                     id="sketch-container"
-                    className="h-full border-4 rounded-xl border-black"
+                    className="h-full border-4 rounded-xl gradient-border"
                 />
                 {feedbackVisible && (
                     <ImageActions

@@ -25,10 +25,18 @@ function App() {
                     <div className="basis-1/2 bg-white rounded-xl h-full mr-1">
                         <Sketch inputValue={inputValue} setLoading={setLoading} />
                     </div>
-                    <div className="basis-1/2 flex flex-col justify-center px-7">
-                        <h1 className="title shadow-black text-8xl text-green-900 font-bold drop-shadow-xl">
-                            turtle dA VincI{' '}
-                        </h1>
+                    <div className="basis-1/2 flex flex-col justify-center px-5">
+                        <p
+                            className="title shadow-black text-8xl text-green-200 font-bold drop-shadow-xl mb-2"
+                            style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)' }}
+                        >
+                            turtle d<span className="text-green-300 inline">A</span> Vinc
+                            <span className="text-green-300 inline">I</span>
+                        </p>
+
+                        <p className="tagline text-2xl text-white mb-5 mt-1">
+                            🖌️ Transforming Text to Art !
+                        </p>
 
                         <SubmitMessage {...{ loading }} />
 
