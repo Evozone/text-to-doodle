@@ -177,7 +177,7 @@ const Feedback = ({ inputValue }) => {
 
     // POST
     const submitDoodle = async () => {
-        await axios.post(`http://localhost:8080/api/magenta/strokes`, {
+        await axios.post(`${import.meta.env.VITE_APP_SERVER_URL}/api/magenta/strokes`, {
             word: inputValue,
             strokes: arrayToString(strokes),
         });

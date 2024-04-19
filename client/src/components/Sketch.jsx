@@ -29,7 +29,9 @@ const Sketch = ({ inputValue, setLoading }) => {
     useEffect(() => {
         const checkInputAvailability = async () => {
             const response = await axios.get(
-                `http://localhost:8080/api/magenta/check?word=${inputValue}`
+                `${
+                    import.meta.env.VITE_APP_SERVER_URL
+                }/api/magenta/check?word=${inputValue}`
             );
             console.log(response.data);
             // Delete all childern of the container
