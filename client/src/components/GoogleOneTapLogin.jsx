@@ -80,7 +80,7 @@ const GoogleOneTapLogin = ({ setNavigateHome }) => {
     return (
         <React.Fragment>
             <button
-                className="bg-black hover:bg-gray-700 text-white font-bold py-2 px-4 rounded flex justify-center items-center"
+                className="bg-green-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded flex justify-center items-center"
                 style={{
                     display: displayType,
                     width: 'fit-content',

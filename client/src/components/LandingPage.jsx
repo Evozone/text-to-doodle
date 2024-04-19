@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import GoogleOneTapLogin from './GoogleOneTapLogin';
 import * as ms from '@magenta/sketch';
+import '../index.css';
 
 const LandingPage = ({ setNavigateHome }) => {
     const [model, setModel] = useState(null);
@@ -142,16 +143,28 @@ const LandingPage = ({ setNavigateHome }) => {
             <div className="basis-1/2 bg-white rounded-xl h-full mr-1">
                 <div
                     id="sketch-container1"
-                    className="h-full border-4 rounded-xl border-black"
+                    className="h-full border-4 rounded-xl gradient-border"
                 />
             </div>
             <div className="w-1/2 p-4 flex item-center flex-col">
                 <p
-                    className="h-1/4 text-3xl font-bold mt-6 text-white flex justify-center items-center"
+                    className="title shadow-black text-8xl text-green-200 font-bold drop-shadow-xl mb-2"
                     style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)' }}
                 >
-                    Sketchify - Transforming Text to Art
+                    turtle d<span className="text-green-300 inline">A</span> Vinc
+                    <span className="text-green-300 inline">I</span>
                 </p>
+
+                <p className="tagline text-2xl text-white mb-5 mt-1">
+                    🖌️ Transforming Text to Art !
+                </p>
+                <div className="gradient-border p-3 mb-5 bg-black">
+                    <p className="text-xl text-white">
+                        Fun fact: Leonardo's surname wasn't actually daVinci but rather it
+                        means 'from Vinci', which is just a city from Italy. It's like
+                        calling DiCaprio Leonardo da Los Angeles.
+                    </p>
+                </div>
                 <div className="flex items-center justify-center">
                     <GoogleOneTapLogin setNavigateHome={setNavigateHome} />
                 </div>
