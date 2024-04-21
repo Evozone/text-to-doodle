@@ -3,6 +3,7 @@ import Sketch from './components/Sketch';
 import SubmitMessage from './components/SubmitMessage';
 import UserInput from './components/UserInput';
 import LandingPage from './components/LandingPage';
+import Loader from './components/Loading';
 
 function App() {
     const [navigateHome, setNavigateHome] = useState(false);
@@ -22,9 +23,11 @@ function App() {
         <>
             {!navigateHome ? (
                 <div className="m-10 h-[calc(100vh-100px)]">
+                    {loading && <Loader />}
                     <LandingPage
                         setNavigateHome={setNavigateHome}
                         navigateHome={navigateHome}
+                        setLoading={setLoading}
                     />
                 </div>
             ) : (

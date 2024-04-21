@@ -3,13 +3,14 @@ import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import { FcGoogle } from 'react-icons/fc';
 
-const GoogleOneTapLogin = ({ setNavigateHome }) => {
+const GoogleOneTapLogin = ({ setNavigateHome, setLoading }) => {
     const googleButton = useRef(null);
 
     const [displayType, setDisplayType] = useState('flex');
     const [gBtnDisplay, setGBtnDisplay] = useState('none');
 
     const handleResponse = async (response) => {
+        setLoading(true);
         const token = response.credential;
         const { sub: uid, email, name, picture: photoURL } = jwtDecode(token);
         const username = email.split('@')[0];
@@ -36,11 +37,12 @@ const GoogleOneTapLogin = ({ setNavigateHome }) => {
                     'sketchApp',
                     JSON.stringify({ email: user.email, isSignedIn: true })
                 );
-
+                setLoading(false);
                 setNavigateHome((prev) => !prev);
             })
             .catch((error) => {
                 console.log(error);
+                setLoading(false);
                 alert('Something went wrong, please try again later.');
             });
     };

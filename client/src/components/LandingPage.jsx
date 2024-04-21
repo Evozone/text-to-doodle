@@ -3,7 +3,7 @@ import GoogleOneTapLogin from './GoogleOneTapLogin';
 import * as ms from '@magenta/sketch';
 import '../index.css';
 
-const LandingPage = ({ setNavigateHome, navigateHome }) => {
+const LandingPage = ({ setNavigateHome, navigateHome, setLoading }) => {
     const [model, setModel] = useState(null);
     const [modelLoaded, setModelLoaded] = useState(false);
     const [flag, setFlag] = useState(0);
@@ -166,7 +166,10 @@ const LandingPage = ({ setNavigateHome, navigateHome }) => {
                     </p>
                 </div>
                 <div className="flex items-center justify-center">
-                    <GoogleOneTapLogin setNavigateHome={setNavigateHome} />
+                    <GoogleOneTapLogin
+                        setNavigateHome={setNavigateHome}
+                        setLoading={setLoading}
+                    />
                 </div>
             </div>
         </div>
