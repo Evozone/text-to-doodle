@@ -22,7 +22,10 @@ function App() {
         <>
             {!navigateHome ? (
                 <div className="m-10 h-[calc(100vh-100px)]">
-                    <LandingPage setNavigateHome={setNavigateHome} />
+                    <LandingPage
+                        setNavigateHome={setNavigateHome}
+                        navigateHome={navigateHome}
+                    />
                 </div>
             ) : (
                 <div className="m-10 flex items-center justify-center h-[calc(100vh-100px)]">
