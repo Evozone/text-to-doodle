@@ -76,6 +76,12 @@ const GoogleOneTapLogin = ({ setNavigateHome }) => {
         }
     };
 
+    useEffect(() => {
+        const auth = JSON.parse(window.localStorage.getItem('sketchApp'));
+        if (!(auth && auth.isSignedIn)) {
+            handleGoogleLogIn();
+        }
+    }, []);
     return (
         <React.Fragment>
             <button
