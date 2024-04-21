@@ -47,23 +47,28 @@ const GoogleOneTapLogin = ({ setNavigateHome }) => {
 
     const handleGoogleLogIn = () => {
         try {
-            // console.log(import.meta.env.VITE_GOOGLE_CLIENT_ID);
             window.google.accounts.id.initialize({
                 client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-                ux_mode: 'popup',
+                use_fedcm_for_prompt: true,
+                auto_select: true,
+                cancel_on_tap_outside: false,
                 callback: handleResponse,
-                use_fedcm_for_prompt: false,
+                prompt_parent_id: 'googleButtonId',
+                itp_support: true,
+                ux_mode: 'popup',
+            });
+
+            window.google.accounts.id.prompt(() => {
+                setDisplayType('none');
+                setGBtnDisplay('flex');
             });
             window.google.accounts.id.renderButton(googleButton.current, {
-                theme: 'filled_blue',
+                theme: 'outline',
                 size: 'large',
-                width: 280,
+                logo_alignment: 'left',
+                locale: 'en_US',
                 text: 'continue_with',
-            });
-            window.google.accounts.id.prompt((notification) => {
-                if (notification.getSkippedReason() === 'tap_outside') {
-                    window.google.accounts.id.prompt();
-                }
+                width: 280,
             });
         } catch (error) {
             console.log(error);
@@ -71,16 +76,10 @@ const GoogleOneTapLogin = ({ setNavigateHome }) => {
         }
     };
 
-    useEffect(() => {
-        const auth = JSON.parse(window.localStorage.getItem('sketchApp'));
-        if (!(auth && auth.isSignedIn)) {
-            handleGoogleLogIn();
-        }
-    }, []);
     return (
         <React.Fragment>
             <button
-                className="bg-green-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded flex justify-center items-center"
+                className="googleButton bg-green-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded flex justify-center items-center"
                 style={{
                     display: displayType,
                     width: 'fit-content',
