@@ -128,12 +128,12 @@ const Feedback = ({ inputValue }) => {
         canvas.addEventListener('mousedown', onMouseDown);
         canvas.addEventListener('mouseup', onMouseUp);
         canvas.addEventListener('mouseout', onMouseUp);
-        canvas.addEventListener('mousemove', throttle(onMouseMove, 10));
+        canvas.addEventListener('mousemove', throttle(onMouseMove, 200));
 
         canvas.addEventListener('touchstart', onMouseDown);
         canvas.addEventListener('touchend', onMouseUp);
         canvas.addEventListener('touchcancel', onMouseUp);
-        canvas.addEventListener('touchmove', throttle(onMouseMove, 10));
+        canvas.addEventListener('touchmove', throttle(onMouseMove, 200));
 
         const onResize = () => {
             canvas.width = 500;
@@ -169,7 +169,7 @@ const Feedback = ({ inputValue }) => {
     const clearCanvas = () => {
         const canvas = canvasRef.current;
         const context = canvas?.getContext('2d');
-        context.clearRect(0, 0, canvas.width, canvas.height);
+        context?.clearRect(0, 0, canvas.width, canvas.height);
         console.log(arrayToString(strokes));
         setStrokes([]);
         closeModal();

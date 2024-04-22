@@ -58,7 +58,7 @@ const Sketch = ({ inputValue, setLoading }) => {
             // Clear the canvas
             const canvas = document.querySelector('canvas');
             const context = canvas?.getContext('2d');
-            context.clearRect(0, 0, canvas.width, canvas.height);
+            context?.clearRect(0, 0, canvas.width, canvas.height);
 
             // unmount the canvas
             canvas.remove();
