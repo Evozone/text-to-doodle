@@ -17,6 +17,7 @@ function App() {
     }, []);
     const handleLogout = () => {
         window.localStorage.removeItem('sketchApp');
+        setInputValue('');
         setNavigateHome(false);
     };
     return (
