@@ -3,7 +3,7 @@ import GoogleOneTapLogin from './GoogleOneTapLogin';
 import * as ms from '@magenta/sketch';
 import '../index.css';
 
-const LandingPage = ({ setNavigateHome }) => {
+const LandingPage = ({ setNavigateHome, navigateHome, setLoading }) => {
     const [model, setModel] = useState(null);
     const [modelLoaded, setModelLoaded] = useState(false);
     const [flag, setFlag] = useState(0);
@@ -42,7 +42,7 @@ const LandingPage = ({ setNavigateHome }) => {
             canvasRendered.current = true;
             loadModel('flower');
         }
-    }, []);
+    }, [navigateHome]);
     // Drawing loop
     useEffect(() => {
         // Ensure p5.js is loaded before creating p5 instance
@@ -166,7 +166,10 @@ const LandingPage = ({ setNavigateHome }) => {
                     </p>
                 </div>
                 <div className="flex items-center justify-center">
-                    <GoogleOneTapLogin setNavigateHome={setNavigateHome} />
+                    <GoogleOneTapLogin
+                        setNavigateHome={setNavigateHome}
+                        setLoading={setLoading}
+                    />
                 </div>
             </div>
         </div>
