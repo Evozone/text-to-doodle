@@ -49,7 +49,7 @@ const Feedback = ({ inputValue }) => {
         // Canvas Config
         const canvas = canvasRef.current;
         if (!canvas) return;
-        const context = canvas.getContext('2d');
+        const context = canvas?.getContext('2d');
         const current = {
             color: 'black',
         };
@@ -168,7 +168,7 @@ const Feedback = ({ inputValue }) => {
 
     const clearCanvas = () => {
         const canvas = canvasRef.current;
-        const context = canvas.getContext('2d');
+        const context = canvas?.getContext('2d');
         context.clearRect(0, 0, canvas.width, canvas.height);
         console.log(arrayToString(strokes));
         setStrokes([]);

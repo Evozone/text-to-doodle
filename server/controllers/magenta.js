@@ -28,7 +28,12 @@ export const checkMagenta = async (req, res) => {
       }
     }
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    // Find status code from error message
+    let status = 404;
+    if (error.response) {
+      status = error.response.status;
+    }
+    res.status(status).json({ message: error.message });
   }
 };
 
