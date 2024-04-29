@@ -23,6 +23,7 @@ app.use("/api/magenta", magenta);
 app.use("/api/user", user);
 
 app.get("/", (req, res) => {
+  console.log("cron job pinged");
   res.send("Hello, welocme to  API!");
 });
 
