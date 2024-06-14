@@ -10,6 +10,7 @@ export const checkMagenta = async (req, res) => {
       console.log("word found in magenta_words");
       res.status(200).json({ flag: true, word: word });
     } else {
+      console.log("word not found in magenta_words, checking weaviate...");
       const url = `${process.env.MAGENTA_WEAVIATE}/?query=${word}&limit=1`;
       const response = await axios.get(url);
 
@@ -19,6 +20,9 @@ export const checkMagenta = async (req, res) => {
           .status(200)
           .json({ flag: true, word: response.data[0].nameOfImage });
       } else {
+        console.log(
+          "word not found in magenta_weaviate, checking doodle_stroke_weaviate..."
+        );
         const url = `${process.env.DOODLE_STROKE_WEAVIATE}/?query=${word}`;
         const response = await axios.get(url);
         console.log("word found in doodle_stroke_weaviate");
